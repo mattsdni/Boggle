@@ -19,6 +19,7 @@ public class BoggleMain extends PApplet
     static boolean locked = false;
     int currentColor;
     ScoreBoard scoreBoard;
+    Timer stopWatch;
 
     public static void main(String args[])
     {
@@ -36,6 +37,7 @@ public class BoggleMain extends PApplet
         board = new boggleBoard(this);
         playButton = new button(this, width / 2, 600, 200, 100, "Play", color(20), color(60));
         scoreBoard = new ScoreBoard(this);
+        stopWatch = new Timer(this);
     }
 
     public void draw()
@@ -73,6 +75,8 @@ public class BoggleMain extends PApplet
         fill(0);
         text(typing, width / 2, 105);
         scoreBoard.display();
+        stopWatch.display();
+
     }
 
     void update(int x, int y)
@@ -121,15 +125,18 @@ public class BoggleMain extends PApplet
                 if (input.length() < 3)
                     typing = "Word must be at least 3 letters!";
 
-                //make sure word is in dictionary
+                    //make sure word is in dictionary
                 else if (dict.dictionary.get(dict.hash(input)) == null)
                     typing = "Word is not in dictionary!";
 
-                //make sure word is on board
-                else if(!onBoard())
+                    //make sure word is on board
+                else if(!board.hasWord(input))
                     typing = "Word is not on the board!";
                 else
+                {
                     typing = "Congratulations, you found a word";
+                    scoreBoard.scoreWord(input);
+                }
             }
         }
         else if (key == BACKSPACE)
@@ -147,13 +154,6 @@ public class BoggleMain extends PApplet
 
     public boolean onBoard()
     {
-        for (int i = 0; i < 16; i++)
-            if (board.tiles[i].letter.equals(input.charAt(0) + ""))
-            {
-                System.out.println("found yer first letter");
-            }
-        //board.tiles[0].visited
-        scoreBoard.scoreWord(input);
         return false;
     }
 

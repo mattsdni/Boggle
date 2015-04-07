@@ -12,7 +12,7 @@ import java.util.Scanner;
 public class boggleBoard
 {
     PApplet parent;
-    letterTile[] tiles;
+    letterTile[][] tiles;
     String[][] dice;
     Scanner scan = null;
     String dir;
@@ -20,7 +20,7 @@ public class boggleBoard
     boggleBoard(PApplet p)
     {
         parent = p;
-        tiles = new letterTile[16];
+        tiles = new letterTile[4][4];
         dice = new String[16][6];
         dir = System.getProperty("user.dir");
         try
@@ -39,20 +39,18 @@ public class boggleBoard
                 dice[i][j] = scan.next();
 
         //initialize tiles
-        for (int i = 0; i < 16; i++)
-        {
-            tiles[i] = new letterTile(parent, letterGenerator(i));
-        }
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                tiles[i][j] = new letterTile(parent, letterGenerator(i*4+j));
     }
 
     public void display()
     {
 
         parent.rectMode(parent.CORNER);
-        for (int i = 0; i < 16; i++)
-        {
-            tiles[i].display(115+200*(i%4), 160+200*(i/4));
-        }
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                tiles[i][j].display(115+200*i, 160+200*j);
     }
 
     private String letterGenerator(int i)
@@ -66,5 +64,38 @@ public class boggleBoard
         int randomNum = rand.nextInt((max - min) + 1) + min;
         System.out.println(randomNum);
         return randomNum;
+    }
+
+    public boolean hasWord(String word)
+    {
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                if (hasWord(word, i, j))
+                    return true;
+        return false;
+    }
+
+    private boolean hasWord(String word, int row, int col)
+    {
+        if (word.equals(""))
+            return true;
+        if (row > 3 || col > 3 || row < 0 || col < 0)
+            return false;
+        if (tiles[row][col].letter.toLowerCase().compareTo(word.charAt(0)+"") != 0 || tiles[row][col].visited)
+        {
+            return false;
+        }
+        tiles[row][col].visited = true;
+        word = word.substring(1, word.length());
+        boolean found = this.hasWord(word, row+1, col) ||
+                this.hasWord(word, row, col+1) ||
+                this.hasWord(word, row+1, col+1) ||
+                this.hasWord(word, row-1, col) ||
+                this.hasWord(word, row, col-1) ||
+                this.hasWord(word, row-1, col-1) ||
+                this.hasWord(word, row+1, col-1) ||
+                this.hasWord(word, row-1, col+1);
+        tiles[row][col].visited = false;
+        return found;
     }
 }

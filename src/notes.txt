@@ -1,29 +1,5 @@
 TODO:
 fix dice rolling, make die class
-spice up main menu, add floating rotating 3d dice
-get word on board check working
-make a timer for the game
+add stuff to main menu. 2 player? vs ai? vs network?
 handle game over (end of timer)
-
-
-*1. load boggle board
-*2. load dictionary
-*3. display boggle board
-*4. ask user to enter a word
-*5. make sure word is at least 4 letters
-*6. make sure word is in dictionary
-7. make sure word is on board
-
-look for first letter on board
-if it is not on the board
-    complain
-add position(s) to queue
-
-dequeue 1 element from queue and add it to a new path array (which will hopefully hold the list of positions of the word)
-mark that tile as used
-
-look for second letter in unused neighbors
-
-
-
-
+add rounds?

@@ -1,3 +1,11 @@
+TODO:
+fix dice rolling, make die class
+spice up main menu, add floating rotating 3d dice
+get word on board check working
+make a timer for the game
+handle game over (end of timer)
+
+
 *1. load boggle board
 *2. load dictionary
 *3. display boggle board

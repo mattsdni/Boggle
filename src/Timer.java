@@ -30,6 +30,7 @@ public class Timer
     }
     public String toString()
     {
-        return seconds/60+":"+seconds%60;
+        String t = ((seconds%60) < 10) ? "0"+seconds%60 : seconds%60+"";
+        return seconds/60+":"+ t;
     }
 }

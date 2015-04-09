@@ -46,11 +46,10 @@ public class boggleBoard
 
     public void display()
     {
-
         parent.rectMode(parent.CORNER);
         for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++)
-                tiles[i][j].display(115+200*i, 160+200*j);
+                tiles[i][j].display((int)((parent.width-775)/2+200*i), 160+200*j);
     }
 
     private String letterGenerator(int i)

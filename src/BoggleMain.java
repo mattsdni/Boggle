@@ -1,12 +1,33 @@
 import processing.core.PApplet;
 import processing.core.PFont;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 /**
- * Created by Matt on 3/28/2015.
+ * Created by Matt Dennie on 3/28/2015.
+ *
+ Assignment: Lab 7
+ Title: Boggle
+ Course: CSCE 270
+ Lab Section: 11:50am
+ Semester: Fall, 2014
+ Instructor: Laurie Murphy
+ Sources consulted: stackoverflow, wikipedia
+ Program description: Allows the user to play the computer in a game of boggle
+ Known Bugs: no bugs, although AI could be improved
+                make word guessing more natural
+                develop better AI difficulty settings
+                allow player to choose AI difficulty in menu
+             Add PvP mode (2 humans), either local or network
+ Creativity:
+     GUI implemented
+     Gameplay mechanics
+        words guessed by the computer and the player do not count towards final points
+        end game screen added. shows final word lists with cross referenced duplicates removed from both
+        AI randomly 'finds' words on the board (see AI class)
+        game is timed to 3 minutes (can be changed in Timer class)
+     Board is randomly generated every time the program is launched
+     Qu tile is available and counts as an extra point if used
+     Dictionary uses hashtable for constant time word lookup
  */
 public class BoggleMain extends PApplet
 {
@@ -33,6 +54,9 @@ public class BoggleMain extends PApplet
         PApplet.main(new String[]{"BoggleMain"});
     }
 
+    /**
+     * set up all variables and load data
+     */
     public void setup()
     {
         size(1200, 1000, P3D);
@@ -49,6 +73,9 @@ public class BoggleMain extends PApplet
         ai.findWords();
     }
 
+    /**
+     * this is the main loop during execution
+     */
     public void draw()
     {
         if (inMainMenu)
@@ -59,6 +86,9 @@ public class BoggleMain extends PApplet
             postGame();
     }
 
+    /**
+     * the main menu
+     */
     public void mainMenu()
     {
         background(100, 150, 200);
@@ -70,6 +100,9 @@ public class BoggleMain extends PApplet
         update(mouseX, mouseY);
     }
 
+    /**
+     * single player game mode
+     */
     public void sPlay()
     {
         background(240);
@@ -94,6 +127,9 @@ public class BoggleMain extends PApplet
         }
     }
 
+    /**
+     * prepares the necessary data for the post game screen
+     */
     public void postGamePrep()
     {
         delay(2000);
@@ -127,6 +163,7 @@ public class BoggleMain extends PApplet
                 }
             }
         }
+        //format word lists
         playerWords = scoreBoard.player1Words.toString();
         playerWords = playerWords.replaceAll("[\\[\\] ]", "");
         playerWords = playerWords.replaceAll("[\\,]", "\n");
@@ -137,6 +174,9 @@ public class BoggleMain extends PApplet
         inPostGame = true;
     }
 
+    /**
+     * the post game screen
+     */
     public void postGame()
     {
         textSize(48);
@@ -162,6 +202,11 @@ public class BoggleMain extends PApplet
             text("Player 2 Wins!", width/2, 75);
     }
 
+    /**
+     * Calculates the scores at the end of the game
+     * @param words
+     * @return
+     */
     public int postGameScore(LinkedList<String> words)
     {
         int score = 0;
@@ -177,20 +222,26 @@ public class BoggleMain extends PApplet
                 score += 5;
             else if (words.get(i).length() >= 8)
                 score += 11;
+            if (words.get(i).contains("qu"))
+                score++;
         }
         return score;
     }
+
+    /**
+     * Calls the update function for any buttons created
+     * @param x the x coordinate of the mouse
+     * @param y the y coordinate of the mouse
+     */
     void update(int x, int y)
     {
-        if (!locked)
-        {
-            playButton.update();
-        } else
-        {
-            locked = false;
-        }
+        if (!locked){playButton.update();}
+        else{locked = false;}
     }
 
+    /**
+     * called every time the mouse is pressed
+     */
     public void mousePressed()
     {
         if (inMainMenu)
@@ -204,11 +255,10 @@ public class BoggleMain extends PApplet
         }
     }
 
-    public void mouseClicked()
-    {
-        System.out.println("main");
-    }
-
+    /**
+     * called every time a key is pressed.
+     * This is used for word input.
+     */
     public void keyPressed()
     {
         if (typing.length() > 24) //if there is an error message, clear it upon text input
@@ -233,7 +283,7 @@ public class BoggleMain extends PApplet
                 else if(!board.hasWord(input))
                     typing = "Word is not on the board!";
                 else
-                {
+                {   //score the word
                     if(scoreBoard.scoreWord(input, 0))
                         typing = "Congratulations, you found a word";
                     else

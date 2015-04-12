@@ -8,30 +8,29 @@ import java.util.*;
 public class dictionary
 {
     Hashtable dictionary;
-
+    /**
+     * create the dictionary
+     */
     dictionary()
     {
         dictionary = new Hashtable();
     }
-
+    /**
+     * load words from a text file into the hashtable
+     */
     public void load()
     {
         // Create the scanner (open the file for reading)
         Scanner scan = null;
         String word;
-        int lineNum = 0;                //keep track of current line number
+        int lineNum = 0; //keep track of current line number
         String dir = System.getProperty("user.dir");
-
-        try
-        {
-            scan = new Scanner(new File(dir + "\\words.txt"));
-        }
+        try{scan = new Scanner(new File(dir + "\\words.txt"));}
         catch (IOException e)
         {
             System.err.println("Error reading from: " + "words.txt");
             System.exit(1);
         }
-
         while(scan.hasNext())
         {
             lineNum++;
@@ -39,7 +38,6 @@ public class dictionary
             this.dictionary.put(hash(word), word);
         }
     }
-
     /**
      * based on work by Dan Bernstein, djb2, http://www.cse.yorku.ca/~oz/hash.html
      * @param key

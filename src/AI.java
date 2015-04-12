@@ -17,9 +17,9 @@ public class AI
     LinkedList<String> knownWords;
 
     /**
-     *
-     * @param p
-     * @param _difficulty
+     * An AI that plays boggle
+     * @param p a reference to the PApplet
+     * @param _difficulty The difficulty of the AI (needs improvement)
      */
     public AI(PApplet p, int _difficulty)
     {
@@ -28,6 +28,9 @@ public class AI
         knownWords = new LinkedList<String>();
     }
 
+    /**
+     * Finds words on the board and adds them to a linked list of known words
+     */
     public void findWords()
     {
         Scanner scan = null;
@@ -63,10 +66,15 @@ public class AI
         }
     }
 
+    /**
+     * generates random numbers between min and max
+     * @param min
+     * @param max
+     * @return the random number
+     */
     private int randInt(int min, int max)
     {
         Random rand = new Random();
-        int randomNum = rand.nextInt((max - min) + 1) + min;
-        return randomNum;
+        return rand.nextInt((max - min) + 1) + min;
     }
 }

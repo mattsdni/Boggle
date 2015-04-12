@@ -2,6 +2,7 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 /**
  * Created by Matt on 3/28/2015.
+ * Represents a tile on the board
  */
 public class letterTile
 {
@@ -9,7 +10,11 @@ public class letterTile
     String letter;
     int sizeX, sizeY;
     boolean visited;
-
+    /**
+     * create the letter tile
+     * @param p a reference to the PApplet
+     * @param s The letter on the tile
+     */
     letterTile(PApplet p, String s)
     {
         parent = p;
@@ -18,7 +23,11 @@ public class letterTile
         sizeY = 175;
         visited = false;
     }
-
+    /**
+     * displays the letter tile
+     * @param x the x position of the tile
+     * @param y the y position of the tile
+     */
     void display(int x, int y)
     {
         parent.noStroke();

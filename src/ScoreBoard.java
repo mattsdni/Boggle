@@ -11,6 +11,10 @@ public class ScoreBoard
     int playerScore, player2Score;
     LinkedList<String> player1Words, player2Words;
 
+    /**
+     * Creates a scoreboard to keep track of the players' scores
+     * @param p a reference to the PApplet
+     */
     ScoreBoard(PApplet p)
     {
         parent = p;
@@ -20,6 +24,9 @@ public class ScoreBoard
         player2Words = new LinkedList<String>();
     }
 
+    /**
+     * displays the scoreboard
+     */
     public void display()
     {
         parent.fill(20);
@@ -43,10 +50,10 @@ public class ScoreBoard
     }
 
     /**
-     * 
+     * Scores a given word
      * @param word
      * @param player 0 for player1 (human), 1 for player2/AI
-     * @return
+     * @return the number of points
      */
     public boolean scoreWord(String word, int player)
     {
@@ -64,6 +71,8 @@ public class ScoreBoard
                 playerScore += 5;
             else if (word.length() >= 8)
                 playerScore += 11;
+            if (word.contains("qu"))
+                playerScore++;
             return true;
         }
         if (player == 1)
@@ -80,11 +89,19 @@ public class ScoreBoard
                 player2Score += 5;
             else if (word.length() >= 8)
                 player2Score += 11;
+            if (word.contains("qu"))
+                playerScore++;
             return true;
         }
         return false;
     }
 
+    /**
+     * determines whether the player has already guessed a word
+     * @param word
+     * @param player
+     * @return true or false
+     */
     private boolean taken(String word, int player)
     {
         if (player == 0)

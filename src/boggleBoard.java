@@ -3,6 +3,8 @@ import processing.core.PConstants;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -13,15 +15,20 @@ public class boggleBoard
 {
     PApplet parent;
     letterTile[][] tiles;
-    String[][] dice;
+    String[][] diceText;
     Scanner scan = null;
     String dir;
+    Die[] dice;
+    ArrayList<Integer> shuffleOrder;
 
     boggleBoard(PApplet p)
     {
         parent = p;
+        shuffleOrder = new ArrayList<Integer>();
+        makeShuffled();
         tiles = new letterTile[4][4];
-        dice = new String[16][6];
+        diceText = new String[16][6];
+        dice = new Die[16];
         dir = System.getProperty("user.dir");
         try
         {
@@ -36,7 +43,17 @@ public class boggleBoard
         //initialize dice
         for (int i = 0; i < 16; i++)
             for (int j = 0; j < 6; j++)
-                dice[i][j] = scan.next();
+                diceText[i][j] = scan.next();
+        for (int i = 0; i < 16; i++)
+        {
+            dice[i] = new Die(diceText[i][0], diceText[i][1], diceText[i][2], diceText[i][3], diceText[i][4], diceText[i][5]);
+        }
+
+        //roll dice
+        for (int i = 0; i < 16; i++)
+        {
+            dice[i].roll();
+        }
 
         //initialize tiles
         for (int i = 0; i < 4; i++)
@@ -44,17 +61,25 @@ public class boggleBoard
                 tiles[i][j] = new letterTile(parent, letterGenerator(i*4+j));
     }
 
+    private void makeShuffled()
+    {
+        for(int i = 0; i < 16; i++)
+        {
+            shuffleOrder.add(i);
+        }
+        Collections.shuffle(shuffleOrder);
+    }
+    private String letterGenerator(int i)
+    {
+        return diceText[shuffleOrder.get(i)][randInt(0,5)];
+    }
+
     public void display()
     {
         parent.rectMode(parent.CORNER);
         for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++)
-                tiles[i][j].display((int)((parent.width-775)/2+200*i), 160+200*j);
-    }
-
-    private String letterGenerator(int i)
-    {
-        return dice[i][randInt(0,5)];
+                tiles[i][j].display(((parent.width-775)/2+200*i), 160+200*j);
     }
 
     public int randInt(int min, int max)

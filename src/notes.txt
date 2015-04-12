@@ -1,5 +1,5 @@
 TODO:
-fix dice rolling, make die class
+remove die stuff
 add stuff to main menu. 2 player? vs ai? vs network?
 handle game over (end of timer)
 add rounds?

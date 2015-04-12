@@ -2,6 +2,7 @@ import processing.core.PApplet;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -12,6 +13,7 @@ public class AI
 {
     PApplet parent;
     int difficulty;
+    //LinkedList<String> knownWords;
 
     public AI(PApplet p, int _difficulty)
     {

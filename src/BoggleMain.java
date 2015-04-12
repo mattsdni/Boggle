@@ -37,7 +37,7 @@ public class BoggleMain extends PApplet
 
     public void setup()
     {
-        size(1200, 1000);
+        size(1200, 1000, P3D);
         dir = System.getProperty("user.dir");
         font = createFont(dir + "\\Data\\arialbd.ttf", 48);
         textFont(font, 48);
@@ -50,7 +50,6 @@ public class BoggleMain extends PApplet
         stopWatch = new Timer(this);
         ai = new AI(this, 10);
         ai.findWords();
-        //printAllWords();
     }
 
     public void draw()
@@ -96,15 +95,7 @@ public class BoggleMain extends PApplet
         stopWatch.display();
         if (stopWatch.seconds < 0)
         {
-            delay(2000);
-            playerWords = scoreBoard.player1Words.toString();
-            playerWords = playerWords.replaceAll("[\\[\\] ]", "");
-            playerWords = playerWords.replaceAll("[\\,]", "\n");
-            AIWords = scoreBoard.player2Words.toString();
-            AIWords = AIWords.replaceAll("[\\[\\] ]", "");
-            AIWords = AIWords.replaceAll("[\\,]", "\n");
-            sPlaying = false;
-            inPostGame = true;
+            postGamePrep();
         }
     }
 
@@ -127,6 +118,29 @@ public class BoggleMain extends PApplet
         stopWatch.display();
     }
 
+    public void postGamePrep()
+    {
+        delay(2000);
+        for (int i = 0; i < scoreBoard.player1Words.size(); i++)
+        {
+            if (AIWords.contains(scoreBoard.player1Words.get(i)))
+                scoreBoard.player1Words.remove(i);
+        }
+        for (int i = 0; i < scoreBoard.player2Words.size(); i++)
+        {
+            if (playerWords.contains(scoreBoard.player2Words.get(i)))
+                scoreBoard.player2Words.remove(i);
+        }
+        playerWords = scoreBoard.player1Words.toString();
+        playerWords = playerWords.replaceAll("[\\[\\] ]", "");
+        playerWords = playerWords.replaceAll("[\\,]", "\n");
+        AIWords = scoreBoard.player2Words.toString();
+        AIWords = AIWords.replaceAll("[\\[\\] ]", "");
+        AIWords = AIWords.replaceAll("[\\,]", "\n");
+        sPlaying = false;
+        inPostGame = true;
+
+    }
     public void postGame()
     {
         textSize(48);
@@ -140,6 +154,7 @@ public class BoggleMain extends PApplet
         text("Player Words", 300, 150);
         line(width-125,170,width-475,170);
         text("AI Words", width-300, 150);
+
 
     }
     void update(int x, int y)

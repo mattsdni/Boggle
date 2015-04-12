@@ -11,7 +11,7 @@ public class Timer
     Timer(PApplet p)
     {
         parent = p;
-        seconds = 180;
+        seconds = 20;
         startTime = parent.second();
     }
 

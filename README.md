@@ -1,5 +1,4 @@
 # Boggle
-A game of words
 The primary purpose of this project is to implement a recursive searching algorithm on the board to look for words.
 
 <img src="https://cloud.githubusercontent.com/assets/10458699/7106758/c581c778-e101-11e4-8749-98ba95219298.png"

@@ -38,6 +38,7 @@ public class ScoreBoard
         String temp2 = player2Words.toString();
         temp2 = temp2.replaceAll("[\\[\\] ]", "");
         temp2 = temp2.replaceAll("[\\,]", "\n");
+        temp2 = temp2.replaceAll("[a-zA-Z]", "-");
         parent.text(temp2, parent.width-100, 195);
     }
 
@@ -100,5 +101,4 @@ public class ScoreBoard
         }
         return false;
     }
-
 }

@@ -18,11 +18,9 @@ public class BoggleMain extends PApplet
     String input = "";
     String typing = "";
     boolean sPlaying = false;
-    boolean mPlaying = false;
     boolean inPostGame = false;
     boolean inMainMenu = true;
     button playButton;
-    button multiPlayButton;
     static boolean locked = false;
     int currentColor;
     static ScoreBoard scoreBoard;
@@ -45,7 +43,6 @@ public class BoggleMain extends PApplet
         dict.load();
         board = new boggleBoard(this);
         playButton = new button(this, width / 2-210, 600, 350, 75, "Single Player", color(20), color(60));
-        multiPlayButton = new button(this, width / 2+210, 600, 350, 75, "Multiplayer", color(20), color(60));
         scoreBoard = new ScoreBoard(this);
         stopWatch = new Timer(this);
         ai = new AI(this, 10);
@@ -58,8 +55,6 @@ public class BoggleMain extends PApplet
             mainMenu();
         if (sPlaying)
             sPlay();
-        if (mPlaying)
-            mPlay();
         if(inPostGame)
             postGame();
     }
@@ -72,7 +67,6 @@ public class BoggleMain extends PApplet
         textSize(48);
         text("Boggle", width / 2, 200);
         playButton.display();
-        multiPlayButton.display();
         update(mouseX, mouseY);
     }
 
@@ -93,43 +87,45 @@ public class BoggleMain extends PApplet
         text(typing, width / 2, 105);
         scoreBoard.display();
         stopWatch.display();
+        ai.addWords();
         if (stopWatch.seconds < 0)
         {
             postGamePrep();
         }
     }
 
-    public void mPlay()
-    {
-        background(240);
-        board.display();
-        noFill();
-        strokeWeight(3);
-        stroke(0);
-        rectMode(CENTER);
-        rect(width / 2, 95, 500, 50);
-        fill(20);
-        textAlign(CENTER);
-        textSize(24);
-        text("Enter a word:", width / 2, 50);
-        fill(0);
-        text(typing, width / 2, 105);
-        scoreBoard.display();
-        stopWatch.display();
-    }
-
     public void postGamePrep()
     {
         delay(2000);
+        //find unique player 1 words
         for (int i = 0; i < scoreBoard.player1Words.size(); i++)
         {
-            if (AIWords.contains(scoreBoard.player1Words.get(i)))
-                scoreBoard.player1Words.remove(i);
+            for (int j = 0; j < scoreBoard.player2Words.size(); j++)
+            {
+                if (scoreBoard.player1Words.get(i).equals(scoreBoard.player2Words.get(j)))
+                {
+                    scoreBoard.player1Words.remove(i);
+                    scoreBoard.player2Words.remove(j);
+                    i--;
+                    j--;
+                    break;
+                }
+            }
         }
+        //find unique player 2 (ai) words
         for (int i = 0; i < scoreBoard.player2Words.size(); i++)
         {
-            if (playerWords.contains(scoreBoard.player2Words.get(i)))
-                scoreBoard.player2Words.remove(i);
+            for (int j = 0; j < scoreBoard.player1Words.size(); j++)
+            {
+                if (scoreBoard.player2Words.get(i).equals(scoreBoard.player1Words.get(j)))
+                {
+                    scoreBoard.player2Words.remove(i);
+                    scoreBoard.player1Words.remove(j);
+                    i--;
+                    j--;
+                    break;
+                }
+            }
         }
         playerWords = scoreBoard.player1Words.toString();
         playerWords = playerWords.replaceAll("[\\[\\] ]", "");
@@ -139,8 +135,8 @@ public class BoggleMain extends PApplet
         AIWords = AIWords.replaceAll("[\\,]", "\n");
         sPlaying = false;
         inPostGame = true;
-
     }
+
     public void postGame()
     {
         textSize(48);
@@ -152,17 +148,43 @@ public class BoggleMain extends PApplet
         strokeWeight(5);
         line(125, 170, 475, 170);
         text("Player Words", 300, 150);
-        line(width-125,170,width-475,170);
-        text("AI Words", width-300, 150);
+        line(width - 125, 170, width - 475, 170);
+        text("AI Words", width - 300, 150);
+        int p1score = postGameScore(scoreBoard.player1Words);
+        int p2score = postGameScore(scoreBoard.player2Words);
+        text("Score: " + p1score, 300, height - 100);
+        text("Score: " + p2score, width-300, height-100);
+        if (p1score == p2score)
+            text("Tie", width/2, 75);
+        if (p1score > p2score)
+            text("Player 1 Wins!", width/2, 75);
+        if (p1score < p2score)
+            text("Player 2 Wins!", width/2, 75);
+    }
 
-
+    public int postGameScore(LinkedList<String> words)
+    {
+        int score = 0;
+        for (int i = 0 ; i < words.size(); i++)
+        {
+            if (words.get(i).length() == 3 || words.get(i).length() == 4)
+                score++;
+            else if (words.get(i).length() == 5)
+                score += 2;
+            else if (words.get(i).length() == 6)
+                score += 3;
+            else if (words.get(i).length() == 7)
+                score += 5;
+            else if (words.get(i).length() >= 8)
+                score += 11;
+        }
+        return score;
     }
     void update(int x, int y)
     {
         if (!locked)
         {
             playButton.update();
-            multiPlayButton.update();
         } else
         {
             locked = false;
@@ -178,12 +200,6 @@ public class BoggleMain extends PApplet
                 currentColor = playButton.baseColor;
                 inMainMenu = false;
                 sPlaying = true;
-            }
-            if (multiPlayButton.pressed())
-            {
-                currentColor = multiPlayButton.baseColor;
-                inMainMenu = false;
-                mPlaying = true;
             }
         }
     }
@@ -236,32 +252,6 @@ public class BoggleMain extends PApplet
             if (keyCode != SHIFT)
                 if(typing.length() < 30)
                     typing += key;
-        }
-    }
-
-    public void printAllWords()
-    {
-        Scanner scan = null;
-        String word;
-        String dir = System.getProperty("user.dir");
-
-        try
-        {
-            scan = new Scanner(new File(dir + "\\words.txt"));
-        }
-        catch (IOException e)
-        {
-            System.err.println("Error reading from: " + "words.txt");
-            System.exit(1);
-        }
-
-        while(scan.hasNext())
-        {
-            word = scan.nextLine();
-            if (word.length() > 2 && board.hasWord(word))
-            {
-                System.out.println(word);
-            }
         }
     }
 }

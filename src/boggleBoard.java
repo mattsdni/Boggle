@@ -1,5 +1,4 @@
 import processing.core.PApplet;
-import processing.core.PConstants;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +17,6 @@ public class boggleBoard
     String[][] diceText;
     Scanner scan = null;
     String dir;
-    Die[] dice;
     ArrayList<Integer> shuffleOrder;
 
     boggleBoard(PApplet p)
@@ -28,7 +26,6 @@ public class boggleBoard
         makeShuffled();
         tiles = new letterTile[4][4];
         diceText = new String[16][6];
-        dice = new Die[16];
         dir = System.getProperty("user.dir");
         try
         {
@@ -44,16 +41,6 @@ public class boggleBoard
         for (int i = 0; i < 16; i++)
             for (int j = 0; j < 6; j++)
                 diceText[i][j] = scan.next();
-        for (int i = 0; i < 16; i++)
-        {
-            dice[i] = new Die(diceText[i][0], diceText[i][1], diceText[i][2], diceText[i][3], diceText[i][4], diceText[i][5]);
-        }
-
-        //roll dice
-        for (int i = 0; i < 16; i++)
-        {
-            dice[i].roll();
-        }
 
         //initialize tiles
         for (int i = 0; i < 4; i++)
@@ -85,9 +72,7 @@ public class boggleBoard
     public int randInt(int min, int max)
     {
         Random rand = new Random();
-        int randomNum = rand.nextInt((max - min) + 1) + min;
-        System.out.println(randomNum);
-        return randomNum;
+        return rand.nextInt((max - min) + 1) + min;
     }
 
     public boolean hasWord(String word)

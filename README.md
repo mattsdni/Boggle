@@ -1,13 +1,16 @@
 # Boggle
 A game of words
+The primary purpose of this project is to implement a recursive searching algorithm on the board to look for words.
 
 <img src="https://cloud.githubusercontent.com/assets/10458699/7106758/c581c778-e101-11e4-8749-98ba95219298.png"
  alt="Boggle" title="boggle" align="center" />
 
-## Solving Process
+## Board Searching Process
 
-1. A Queue of spaces is used to keep track of what has been done.
-2. Spaces are taken out of the queue one at a time and marked as visited.
-3. The current space is checked to see if it is the goal.
-4. If not, it looks at all neighboring spaces and adds any that have not yet been visited to the queue. 
-5. 
+1. If the word string is empty, we have found the word on the board.
+2. Otherwise, make sure the row and column values we are looking at are valid.
+3. Then make sure the first letter of the word string matches the tile we are looking at.
+4. Chop off the first letter of the word string.
+5. Recursivly call this function with all adjacent tiles, and save the boolean return value.
+6. Mark the current tile as visited.
+7. Finally, return recursive calls result.

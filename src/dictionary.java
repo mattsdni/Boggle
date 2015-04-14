@@ -25,7 +25,7 @@ public class dictionary
         String word;
         int lineNum = 0; //keep track of current line number
         String dir = System.getProperty("user.dir");
-        try{scan = new Scanner(new File(dir + "\\words.txt"));}
+        try{scan = new Scanner(new File(dir + "\\Data\\words.txt"));}
         catch (IOException e)
         {
             System.err.println("Error reading from: " + "words.txt");

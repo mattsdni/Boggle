@@ -32,7 +32,7 @@ public class boggleBoard
         dir = System.getProperty("user.dir");
         try
         {
-            scan = new Scanner(new File(dir + "\\dice.txt"));
+            scan = new Scanner(new File(dir + "\\Data\\dice.txt"));
         }
         catch (IOException e)
         {

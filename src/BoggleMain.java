@@ -1,6 +1,10 @@
 import processing.core.PApplet;
 import processing.core.PFont;
+import processing.net.Client;
+
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Matt Dennie on 3/28/2015.
@@ -41,13 +45,17 @@ public class BoggleMain extends PApplet
     boolean sPlaying = false;
     boolean inPostGame = false;
     boolean inMainMenu = true;
-    button playButton;
+    boolean inLobby = false;
+    boolean mPlaying = false;
+    button playButton, mPlayButton, connectButton;
     static boolean locked = false;
     int currentColor;
     static ScoreBoard scoreBoard;
     Timer stopWatch;
     String playerWords, AIWords;
     AI ai;
+    Client myClient;
+    boolean clientExists = false;
 
     public static void main(String args[])
     {
@@ -63,16 +71,23 @@ public class BoggleMain extends PApplet
         dir = System.getProperty("user.dir");
         font = createFont(dir + "\\Data\\arialbd.ttf", 48);
         textFont(font, 48);
+        playButton = new button(this, width/2-210, 600, 350, 75, "Single Player", color(20), color(100));
+        mPlayButton = new button(this, width/2+210, 600, 350, 75, "Multiplayer", color(20), color(100));
+        connectButton = new button(this, width-240, 95, 200, 50, "Connect", color(20), color(100));
+    }
+
+    /**
+     * prepares the necessary data for single player games
+     */
+    public void sPlayPrep()
+    {
         dict = new dictionary();
         dict.load();
         board = new boggleBoard(this);
-        playButton = new button(this, width / 2-210, 600, 350, 75, "Single Player", color(20), color(60));
         scoreBoard = new ScoreBoard(this);
         stopWatch = new Timer(this);
-        ai = new AI(this, 10);
-        ai.findWords();
+        ai = new AI(this, 8);
     }
-
     /**
      * this is the main loop during execution
      */
@@ -84,6 +99,10 @@ public class BoggleMain extends PApplet
             sPlay();
         if(inPostGame)
             postGame();
+        if (inLobby)
+            lobby();
+        if(mPlaying)
+            mPlay();
     }
 
     /**
@@ -97,6 +116,7 @@ public class BoggleMain extends PApplet
         textSize(48);
         text("Boggle", width / 2, 200);
         playButton.display();
+        mPlayButton.display();
         update(mouseX, mouseY);
     }
 
@@ -127,6 +147,69 @@ public class BoggleMain extends PApplet
         }
     }
 
+    /**
+     * Multiplayer game mode
+     */
+    public void mPlay()
+    {
+        background(240);
+        board.display();
+        noFill();
+        strokeWeight(3);
+        stroke(0);
+        rectMode(CENTER);
+        rect(width / 2, 95, 500, 50);
+        fill(20);
+        textAlign(CENTER);
+        textSize(24);
+        text("Enter a word:", width / 2, 50);
+        fill(0);
+        text(typing, width / 2, 105);
+        scoreBoard.display();
+        stopWatch.display();
+        ai.addWords();
+        if (stopWatch.seconds < 0)
+        {
+            postGamePrep();
+        }
+    }
+
+    /**
+     * The lobby
+     */
+    public void lobby()
+    {
+        update(mouseX, mouseY);
+        background(240);
+        noFill();
+        strokeWeight(3);
+        stroke(0);
+        rectMode(CENTER);
+        rect(width / 2, 95, 500, 50);
+        fill(20);
+        textAlign(CENTER);
+        textSize(24);
+        text("Enter the IP and port of Server:", width / 2, 50);
+        fill(0);
+        text(typing, width / 2, 105);
+        boolean ipIsValid = validateIP(typing);
+        if (typing.length() > 10 && !ipIsValid)
+            text("That IP doesn't look right", width/2, 150);
+        if (ipIsValid)
+        {
+            text("Ready to Connect!", width / 2, 150);
+            connectButton.display();
+        }
+        if (clientExists)
+        {
+            if (myClient.available() > 0)
+            {
+                fill(20);
+                text("Connected!", width/2, 180);
+
+            }
+        }
+    }
     /**
      * prepares the necessary data for the post game screen
      */
@@ -179,7 +262,7 @@ public class BoggleMain extends PApplet
      */
     public void postGame()
     {
-        textSize(48);
+        textSize(36);
         background(240);
         fill(20);
         textAlign(CENTER);
@@ -235,7 +318,7 @@ public class BoggleMain extends PApplet
      */
     void update(int x, int y)
     {
-        if (!locked){playButton.update();}
+        if (!locked){playButton.update();mPlayButton.update();connectButton.update();}
         else{locked = false;}
     }
 
@@ -249,8 +332,35 @@ public class BoggleMain extends PApplet
             if (playButton.pressed())
             {
                 currentColor = playButton.baseColor;
+                sPlayPrep();
                 inMainMenu = false;
                 sPlaying = true;
+                ai.findWords();
+            }
+            if(mPlayButton.pressed())
+            {
+                currentColor = mPlayButton.baseColor;
+                inMainMenu = false;
+                inLobby = true;
+            }
+        }
+        if(inLobby)
+        {
+            if (connectButton.pressed())
+            {
+                //connect to server
+                String[] ipPort = new String[2];
+                int port = 25565;        //assume 25565 as default port
+                if(typing.contains(":")) //if the port is specified
+                {
+                    ipPort = typing.split(":");
+                    port = Integer.parseInt(ipPort[1]);
+                }
+                else
+                    ipPort[0] = typing;  //make sure we get the ip in there
+                currentColor = connectButton.baseColor;
+                myClient = new Client(this, ipPort[0], port);
+                clientExists = true;
             }
         }
     }
@@ -266,29 +376,41 @@ public class BoggleMain extends PApplet
         // If the return key is pressed, save the String and clear it
         if (key == '\n' )
         {
-            if (typing.length() > 0)
+            if (inLobby)
             {
-                input = typing;
-                input = input.toLowerCase();
-                typing = "";
-                //make sure word is at least 4 letters
-                if (input.length() < 3)
-                    typing = "Word must be at least 3 letters!";
+                //make sure ip and port are formatted correctly
+                if(validateIP(typing))
+                {
+                    //attempt to connect to server
 
-                    //make sure word is in dictionary
-                else if (dict.dictionary.get(dict.hash(input)) == null)
-                    typing = "Word is not in dictionary!";
+                }
+            }
+            if (mPlaying || sPlaying)
+            {
+                if (typing.length() > 0)
+                {
+                    input = typing;
+                    input = input.toLowerCase();
+                    typing = "";
+                    //make sure word is at least 4 letters
+                    if (input.length() < 3)
+                        typing = "Word must be at least 3 letters!";
 
-                    //make sure word is on board
-                else if(!board.hasWord(input))
-                    typing = "Word is not on the board!";
-                else
-                {   //score the word
-                    if(scoreBoard.scoreWord(input, 0))
-                        typing = "Congratulations, you found a word";
+                        //make sure word is in dictionary
+                    else if (dict.dictionary.get(dict.hash(input)) == null)
+                        typing = "Word is not in dictionary!";
+
+                        //make sure word is on board
+                    else if (!board.hasWord(input))
+                        typing = "Word is not on the board!";
                     else
-                        typing = "You already found that word";
+                    {   //score the word
+                        if (scoreBoard.scoreWord(input, 0))
+                            typing = "Congratulations, you found a word";
+                        else
+                            typing = "You already found that word";
 
+                    }
                 }
             }
         }
@@ -303,5 +425,12 @@ public class BoggleMain extends PApplet
                 if(typing.length() < 30)
                     typing += key;
         }
+    }
+    public boolean validateIP(String ip)
+    {
+        String ipRegex = "^(?:(?:1\\d?\\d|[1-9]?\\d|2[0-4]\\d|25[0-5])\\.){3}(?:1\\d?\\d|[1-9]?\\d|2[0-4]\\d|25[0-\u200C\u200B5])(?:[:]\\d+)?$";
+        Pattern pattern = Pattern.compile(ipRegex);
+        Matcher matcher = pattern.matcher(ip);
+        return matcher.matches();
     }
 }

@@ -19,7 +19,7 @@ public class AI
     /**
      * An AI that plays boggle
      * @param p a reference to the PApplet
-     * @param _difficulty The difficulty of the AI (needs improvement)
+     * @param _difficulty The difficulty of the AI (lower is harder)
      */
     public AI(PApplet p, int _difficulty)
     {
@@ -38,7 +38,7 @@ public class AI
         String dir = System.getProperty("user.dir");
         try
         {
-            scan = new Scanner(new File(dir + "\\words.txt"));
+            scan = new Scanner(new File(dir + "\\Data\\words.txt"));
         }
         catch (IOException e)
         {
@@ -60,7 +60,7 @@ public class AI
      */
     public void addWords()
     {
-        if (parent.frameCount%60==0 && randInt(0,10) == 0)
+        if (parent.frameCount%60==0 && randInt(0,difficulty) == 0)
         {
             BoggleMain.scoreBoard.scoreWord(knownWords.get(randInt(0,knownWords.size()-1)), 1);
         }

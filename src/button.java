@@ -49,7 +49,7 @@ public class button
         parent.rect(x,y,width,height);
         parent.textMode(parent.CENTER);
         parent.fill(255);
-        parent.text(text, x, y*1.025f);
+        parent.text(text, x, y+parent.g.textSize/2.5f);
         parent.getBackground();
     }
     /**
